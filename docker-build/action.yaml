@@ -36,12 +36,12 @@ runs:
         [ -n "${{ inputs.dockerfile }}" ] && kargs="$kargs --file ${{ inputs.dockerfile }} "
 
         TAGS=(${{ inputs.tags }})
-        for tag in $TAGS; do
-          kargs="$kargs --tag \"$tag\" "
+        for tag in "${TAGS[@]}"; do
+          kargs="$kargs --tag $tag "
         done
 
         LABELS=(${{ inputs.labels }})
-        for label in $LABELS; do
+        for label in "${LABELS[@]}"; do
           kargs="$kargs --label \"$label\" "
         done
 
