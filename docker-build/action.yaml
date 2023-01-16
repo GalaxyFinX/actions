@@ -1,0 +1,56 @@
+name: Build image with Docker
+
+description: |
+  This action build an OCI image with Docker.
+
+inputs:
+  context:
+    description: context flag
+    default: "."
+    required: false
+
+  dockerfile:
+    description: dockerfile flag
+    default: Dockerfile
+    required: false
+
+  push:
+    description: push image to registry
+    required: false
+    default: "true"
+
+  tags:
+    description: image tags
+    required: true
+
+  labels:
+    description: image labels
+    required: false
+
+runs:
+  using: composite
+  steps:
+    - run: |
+        set -o errexit
+
+        [ -n "${{ inputs.context }}" ] && kargs="$kargs --context ${{ inputs.context }} "
+        [ -n "${{ inputs.dockerfile }}" ] && kargs="$kargs --dockerfile ${{ inputs.dockerfile }} "
+
+        for tag in ${{ inputs.tags }}; do
+          kargs="$kargs --tag $tag "
+        done
+
+        for label in ${{ inputs.labels }}; do
+          kargs="$kargs --label $label "
+        done
+
+        echo "Docker flags: $kargs"
+        docker build $kargs
+      shell: bash
+
+    - if: ${{ inputs.push }} == 'true'
+      run: |
+        for label in ${{ inputs.labels }}; do
+          docker image push $label
+        done
+      shell: bash -c {0}
