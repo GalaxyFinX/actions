@@ -33,7 +33,7 @@ runs:
     - run: |
         set -o errexit
 
-        [ -n "${{ inputs.dockerfile }}" ] && kargs="$kargs --dockerfile ${{ inputs.dockerfile }} "
+        [ -n "${{ inputs.dockerfile }}" ] && kargs="$kargs --file ${{ inputs.dockerfile }} "
 
         TAGS=(${{ inputs.tags }})
         for tag in $TAGS; do
