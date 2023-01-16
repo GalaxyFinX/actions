@@ -37,12 +37,12 @@ runs:
 
         TAGS=(${{ inputs.tags }})
         for tag in $TAGS; do
-          kargs="$kargs --tag $tag "
+          kargs="$kargs --tag \"$tag\" "
         done
 
         LABELS=(${{ inputs.labels }})
         for label in $LABELS; do
-          kargs="$kargs --label $label "
+          kargs="$kargs --label \"$label\" "
         done
 
         echo "Docker flags: $kargs"
