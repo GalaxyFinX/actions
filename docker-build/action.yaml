@@ -33,19 +33,20 @@ runs:
     - run: |
         set -o errexit
 
-        [ -n "${{ inputs.context }}" ] && kargs="$kargs --context ${{ inputs.context }} "
         [ -n "${{ inputs.dockerfile }}" ] && kargs="$kargs --dockerfile ${{ inputs.dockerfile }} "
 
-        for tag in ${{ inputs.tags }}; do
+        TAGS=(${{ inputs.tags }})
+        for tag in $TAGS; do
           kargs="$kargs --tag $tag "
         done
 
-        for label in ${{ inputs.labels }}; do
+        LABELS=(${{ inputs.labels }})
+        for label in $LABELS; do
           kargs="$kargs --label $label "
         done
 
         echo "Docker flags: $kargs"
-        docker build $kargs
+        docker build $kargs ${{ inputs.context }}
       shell: bash
 
     - if: ${{ inputs.push }} == 'true'
@@ -53,4 +54,4 @@ runs:
         for label in ${{ inputs.labels }}; do
           docker image push $label
         done
-      shell: bash -c {0}
+      shell: bash
