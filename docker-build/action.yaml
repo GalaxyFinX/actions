@@ -17,7 +17,7 @@ inputs:
   push:
     description: push image to registry
     required: false
-    default: "true"
+    default: "false"
 
   tags:
     description: image tags
@@ -33,25 +33,33 @@ runs:
     - run: |
         set -o errexit
 
+        # Replace `spaces` by `-`
+        LABELS=($(echo "${{ inputs.labels }}" | tr ' ' '-'))
+        TAGS=($(echo "${{ inputs.tags }}" | tr ' ' '-'))
+
+        # Build docker kargs
         [ -n "${{ inputs.dockerfile }}" ] && kargs="$kargs --file ${{ inputs.dockerfile }} "
 
-        TAGS=(${{ inputs.tags }})
         for tag in "${TAGS[@]}"; do
           kargs="$kargs --tag $tag "
         done
 
-        LABELS=(${{ inputs.labels }})
         for label in "${LABELS[@]}"; do
           kargs="$kargs --label \"$label\" "
         done
 
+        # Execute docker build command
         echo "Docker flags: $kargs"
         docker build $kargs ${{ inputs.context }}
       shell: bash
 
     - if: ${{ inputs.push }} == 'true'
       run: |
-        for label in ${{ inputs.labels }}; do
-          docker image push $label
+        set -o errexit
+
+        TAGS=($(echo "${{ inputs.tags }}" | tr ' ' '-'))
+
+        for tag in "${TAGS[@]}"; do
+          docker image push $tag
         done
       shell: bash

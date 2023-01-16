@@ -1,0 +1,47 @@
+name: Test
+
+on:
+  pull_request:
+    branches:
+      - "main"
+
+permissions:
+  contents: read
+
+env:
+  REGISTRY: test
+  IMAGE_NAME: test
+
+jobs:
+  docker:
+    runs-on:
+      - self-hosted
+      - nonprod-runner
+      - infra-runner
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Docker meta
+        id: meta
+        uses: docker/metadata-action@v4
+        with:
+          # list of Docker images to use as base name for tags
+          images: |
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          # generate Docker tags based on the following events/attributes
+          tags: |
+            type=ref,event=branch
+            type=ref,event=pr
+            type=semver,pattern={{version}}
+          flavor: |
+            latest=false
+
+      - name: Build and push image
+        uses: ./docker-build
+        with:
+          context: "."
+          dockerfile: ./docker-build/Dockerfile.test
+          push: false
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
