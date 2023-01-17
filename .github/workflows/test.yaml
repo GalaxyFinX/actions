@@ -45,3 +45,36 @@ jobs:
           push: false
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+
+  get-changed-dirs:
+    name: Get all changed directories
+    runs-on: ubuntu-22.04
+    outputs:
+      matrix: ${{ steps.get-changed-dirs.outputs.matrix }}
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Get all changed dirs
+        id: get-changed-dirs
+        uses: ./get-changed-dirs
+        with:
+          paths: |
+            **/*.yaml
+
+  echo-changed-dirs:
+    name: Echo changed dirs
+    needs: get-changed-dirs
+    runs-on: ubuntu-22.04
+    strategy:
+      matrix: ${{ fromJSON(needs.get-changed-dirs.outputs.matrix) }}
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Echo changed dirs
+        run: |
+          CURRENT_DIR=${{ matrix.dirs }}
+
+          echo $CURRENT_DIR
+        shell: bash
