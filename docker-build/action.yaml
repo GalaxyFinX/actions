@@ -48,7 +48,7 @@ runs:
         docker build $kargs ${{ inputs.context }}
       shell: bash
 
-    - if: ${{ inputs.push }} == 'true'
+    - if: inputs.push == 'true'
       run: |
         set -o errexit
 

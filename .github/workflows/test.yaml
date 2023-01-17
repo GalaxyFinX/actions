@@ -13,7 +13,10 @@ env:
   IMAGE_NAME: test
 
 jobs:
-  docker:
+  # TODO: add build-and-push test
+  # build-and-push:
+  # ...
+  build-without-push:
     runs-on:
       - self-hosted
       - nonprod-runner
