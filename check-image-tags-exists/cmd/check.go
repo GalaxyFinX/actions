@@ -13,7 +13,7 @@ var checkCmd = &cobra.Command{
 	Use:   "check",
 	Short: "Usage: tagcheck check [OPTIONS] NAME[:TAG] NAME[:TAG] NAME[:TAG]...",
 	Long: `Check if a tag already exist in your OCI Registry. 
-Return "1" if a tag is already exist, otherwise return "0"`,
+Return "1" if a tag already exist, otherwise return "0"`,
 	PreRunE: func(cmd *cobra.Command, args []string) error {
 		if len(args) < 1 {
 			return errors.New("You must provide atleast 1 image name.")
@@ -28,7 +28,7 @@ Return "1" if a tag is already exist, otherwise return "0"`,
 			return err
 		}
 
-		// The flag indicate whether images in the args list are all exist.
+		// The flag indicate whether or not images in the args list exist.
 		flag := true
 		for _, imageName := range args {
 			isExist, err := check.CheckImageTagExist(imageName)

@@ -1,6 +1,6 @@
 # Check Image Tag Exists
 
-Check whether or not the image tags are all exist in the registry.
+Check whether or not all of the image tags already exist in the registry.
 
 Currently, we only support ECR.
 
@@ -8,7 +8,7 @@ Currently, we only support ECR.
 
 ```yaml
   check-image-tag-exists:
-    name: Check whether or not the image tag is already exist in the registry
+    name: Check whether or not all of the image tags exist in the registry
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v3
@@ -16,10 +16,10 @@ Currently, we only support ECR.
       - name: Check
         uses: GalaxyFinX/actions/check-image-tag-exists@706a45ac9fed0bb7f099f4b1fae457e6725d510e
         with:
-          # If we specify 2 images: 1 exist and the other is not, the output will be "0"
+          # If we specify 2 images: 1 exist and the other does not, the output will be "0"
           image-names: >
-            340396142553.dkr.ecr.ap-southeast-1.amazonaws.com/ecr-public/amazoncorretto/amazoncorretto:16 # This image isn't exist
-            340396142553.dkr.ecr.ap-southeast-1.amazonaws.com/ecr-public/amazoncorretto/amazoncorretto:17 # This image is exist in the repo
+            340396142553.dkr.ecr.ap-southeast-1.amazonaws.com/ecr-public/amazoncorretto/amazoncorretto:16 # This image exists in the repo
+            340396142553.dkr.ecr.ap-southeast-1.amazonaws.com/ecr-public/amazoncorretto/amazoncorretto:17 # This image doesn't exist in the repo
           registry-type: ecr
           aws-region: ap-southeast-1
           aws-access-key-id: "xxxxx"
@@ -66,7 +66,7 @@ jobs:
           flavor: |
             latest=false
     
-      - name: Check if tag is already exists
+      - name: Check if tags already exist in the repo
         id: check-tag
         uses: GalaxyFinX/actions/check-image-tag-exists@706a45ac9fed0bb7f099f4b1fae457e6725d510e
         with:
