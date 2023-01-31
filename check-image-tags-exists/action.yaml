@@ -1,0 +1,40 @@
+name: "Check if OCI image tags are all exists in a registry"
+description: "Check if OCI image tag are all exists in a registry"
+
+inputs:
+  image-names:
+    description: "Image names split by `space`"
+    required: true
+  registry-type:
+    description: "Type of your OCI registry (currently support: ecr)"
+    default: ecr
+    required: true
+  # AWS ECR specific configuration
+  aws-region:
+    description: "AWS region"
+    required: false
+  aws-access-key-id:
+    description: "AWS Access Key ID"
+    required: false
+  aws-secret-access-key:
+    description: "AWS Secret Access Key"
+    required: false
+  aws-session-token:
+    description: "AWS Session Token"
+    required: false
+  # Dockerhub specific configuration
+  # ...
+outputs:
+  is-exists:
+    description: "Flag indicating whether the OCI image exists or not."
+runs:
+  using: "docker"
+  image: "Dockerfile"
+  env:
+    AWS_ACCESS_KEY_ID: "${{ inputs.aws-access-key-id }}"
+    AWS_SECRET_ACCESS_KEY: "${{ inputs.aws-secret-access-key }}"
+    AWS_SESSION_TOKEN: "${{ inputs.aws-session-token }}"
+    AWS_DEFAULT_REGION: "${{ inputs.aws-region }}"
+  args:
+    - ${{ inputs.registry-type }}
+    - ${{ inputs.image-name }}
