@@ -37,4 +37,4 @@ runs:
     AWS_DEFAULT_REGION: "${{ inputs.aws-region }}"
   args:
     - ${{ inputs.registry-type }}
-    - ${{ inputs.image-name }}
+    - ${{ inputs.image-names }}
