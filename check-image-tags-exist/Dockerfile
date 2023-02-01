@@ -1,5 +1,7 @@
 FROM golang:1.19.5-alpine
 
+RUN apk --no-cache add bash
+
 WORKDIR /app
 
 COPY . /app
