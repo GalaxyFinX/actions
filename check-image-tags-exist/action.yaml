@@ -22,6 +22,12 @@ inputs:
   aws-session-token:
     description: "AWS Session Token"
     required: false
+  aws-web-identity-token:
+    description: "AWS Web Identity Token"
+    required: false
+  aws-role-arn:
+    description: "AWS Role ARN"
+    required: false
   # Dockerhub specific configuration
   # ...
 outputs:
@@ -35,6 +41,8 @@ runs:
     AWS_SECRET_ACCESS_KEY: "${{ inputs.aws-secret-access-key }}"
     AWS_SESSION_TOKEN: "${{ inputs.aws-session-token }}"
     AWS_DEFAULT_REGION: "${{ inputs.aws-region }}"
+    AWS_WEB_IDENTITY_TOKEN: "${{ inputs.aws-web-identity-token }}"
+    AWS_ROLE_ARN: "${{ inputs.aws-role-arn }}"
   args:
     - ${{ inputs.registry-type }}
     - ${{ inputs.image-names }}
