@@ -5,7 +5,7 @@ import (
 )
 
 type Checker interface {
-	// CheckImageTagExist will return true if the tag is already exist in your registry,
+	// CheckImageTagExist will return true if the tag already exist in your registry,
 	// otherwise, return false.
 	CheckImageTagExist(imageName string) (bool, error)
 }
