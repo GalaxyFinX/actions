@@ -18,7 +18,7 @@ var checkCmd = &cobra.Command{
 Return "1" if a tag already exist, otherwise return "0"`,
 	PreRunE: func(cmd *cobra.Command, args []string) error {
 		if len(args) < 1 {
-			return errors.New("You must provide atleast 1 image name.")
+			return errors.New("you must provide atleast 1 image name")
 		}
 
 		return nil
@@ -40,7 +40,7 @@ Return "1" if a tag already exist, otherwise return "0"`,
 			if err != nil {
 				return err
 			}
-			if isExist == false {
+			if !isExist {
 				flag = false
 			}
 		}

@@ -16,6 +16,7 @@ fi
 # Main
 is_exists=$(/go/bin/tagcheck check --type $1 --panic=$2 $3)
 if [ $? -eq 0 ]; then # Check error ouput of the above command
+  echo $is_exists
   echo "is_exists=$is_exists" >> $GITHUB_OUTPUT
 else
   echo $is_exists

@@ -33,17 +33,17 @@ func NewECRCheck(panic bool) (Checker, error) {
 // extractInfoFromImageName will split your image name into 3 differents part: repo, tag and registryID.
 // Note that this is only required by AWS ECR sdk.
 func extractInfoFromImageName(imageName string) (repo string, tag string, registryID string) {
-	repoRegex := regexp2.MustCompile("(?<=\\/)(.*)(?=\\:)", 0)
+	repoRegex := regexp2.MustCompile("(?<=\\/)(.+)(?=\\:)", 0)
 	if m, _ := repoRegex.FindStringMatch(imageName); m != nil {
 		repo = m.String()
 	}
 
-	tagRegex := regexp2.MustCompile("(?<=\\:)(.*)", 0)
+	tagRegex := regexp2.MustCompile("(?<=\\:)(.+)", 0)
 	if m, _ := tagRegex.FindStringMatch(imageName); m != nil {
 		tag = m.String()
 	}
 
-	registryIDRegex := regexp2.MustCompile("^[0-9]*(?=\\.)", 0)
+	registryIDRegex := regexp2.MustCompile("^[0-9]+(?=\\.)", 0)
 	if m, _ := registryIDRegex.FindStringMatch(imageName); m != nil {
 		registryID = m.String()
 	}
@@ -72,7 +72,7 @@ func (ecrCheck ECRCheck) CheckImageTagExist(imageName string) (bool, error) {
 		for _, image := range out.ImageIds {
 			if image.ImageTag != nil && *image.ImageTag == tag {
 				if ecrCheck.panic {
-					return false, errors.New("Tag already exists in the repo.")
+					return false, errors.New("tag already exist in the registry")
 				}
 
 				return true, nil
