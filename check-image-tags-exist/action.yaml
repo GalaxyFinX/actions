@@ -49,4 +49,5 @@ runs:
     AWS_ROLE_ARN: "${{ inputs.aws-role-arn }}"
   args:
     - ${{ inputs.registry-type }}
+    - ${{ inputs.panic }}
     - ${{ inputs.image-names }}
