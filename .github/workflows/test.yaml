@@ -67,6 +67,7 @@ jobs:
     name: Echo changed dirs
     needs: get-changed-dirs
     runs-on: ubuntu-22.04
+    if: needs.get-changed-dirs.outputs.matrix.dirs != '[]'
     strategy:
       matrix: ${{ fromJSON(needs.get-changed-dirs.outputs.matrix) }}
     steps:
