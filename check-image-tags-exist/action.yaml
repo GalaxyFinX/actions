@@ -9,6 +9,10 @@ inputs:
     description: "Type of your OCI registry (currently support: ecr)"
     default: ecr
     required: true
+  panic:
+    description: "Throw error if tags already exist in the repo"
+    default: "false"
+    required: false
   # AWS ECR specific configuration
   aws-region:
     description: "AWS region"

@@ -8,6 +8,8 @@ import (
 	"github.com/spf13/cobra"
 )
 
+var panic bool
+
 // checkCmd represents the check command
 var checkCmd = &cobra.Command{
 	Use:   "check",
@@ -23,7 +25,10 @@ Return "1" if a tag already exist, otherwise return "0"`,
 	},
 	RunE: func(cmd *cobra.Command, args []string) error {
 		registryType, _ := cmd.Flags().GetString("type")
-		check, err := check.NewChecker(registryType)
+		check, err := check.NewChecker(&check.CheckerOptions{
+			RegistryType: registryType,
+			Panic:        panic,
+		})
 		if err != nil {
 			return err
 		}
@@ -54,5 +59,6 @@ func init() {
 	rootCmd.AddCommand(checkCmd)
 
 	checkCmd.Flags().StringP("type", "t", "ecr", "Type of your OCI registry (currently support: ecr)")
+	checkCmd.Flags().BoolVarP(&panic, "panic", "", false, "Throw error if tags already exist in the repo")
 	checkCmd.MarkFlagRequired("type")
 }
