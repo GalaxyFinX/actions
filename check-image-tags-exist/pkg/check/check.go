@@ -28,7 +28,7 @@ func NewChecker(checkOptions *CheckerOptions) (Checker, error) {
 	// 	}
 	// 	return dockerCheck, nil
 	default:
-		return nil, errors.New("Invalid registry type.")
+		return nil, errors.New("invalid registry type")
 	}
 }
 
