@@ -2,7 +2,7 @@ package check
 
 import (
 	"context"
-	"log"
+	"errors"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/config"
@@ -11,21 +11,22 @@ import (
 )
 
 type ECRCheck struct {
-	cfg *aws.Config
+	cfg   *aws.Config
+	panic bool
 }
 
-func NewECRCheck() (Checker, error) {
+func NewECRCheck(panic bool) (Checker, error) {
 	// Using the SDK's default configuration, loading additional config
 	// and credentials values from the environment variables, shared
 	// credentials, and shared configuration files
 	cfg, err := config.LoadDefaultConfig(context.TODO())
 	if err != nil {
-		log.Fatalf("unable to load SDK config, %v", err)
 		return nil, err
 	}
 
 	return &ECRCheck{
-		cfg: &cfg,
+		cfg:   &cfg,
+		panic: panic,
 	}, nil
 }
 
@@ -70,6 +71,10 @@ func (ecrCheck ECRCheck) CheckImageTagExist(imageName string) (bool, error) {
 
 		for _, image := range out.ImageIds {
 			if image.ImageTag != nil && *image.ImageTag == tag {
+				if ecrCheck.panic {
+					return false, errors.New("Tag already exists in the repo.")
+				}
+
 				return true, nil
 			}
 		}

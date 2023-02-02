@@ -10,10 +10,11 @@ type Checker interface {
 	CheckImageTagExist(imageName string) (bool, error)
 }
 
-func NewChecker(registryType string) (Checker, error) {
-	switch registryType {
+// NewChecker is Checker factory
+func NewChecker(checkOptions *CheckerOptions) (Checker, error) {
+	switch checkOptions.RegistryType {
 	case "ecr":
-		ecrCheck, err := NewECRCheck()
+		ecrCheck, err := NewECRCheck(checkOptions.Panic)
 		if err != nil {
 			return nil, err
 		}
@@ -21,7 +22,7 @@ func NewChecker(registryType string) (Checker, error) {
 	// Example of a new regisry type.
 	//
 	// case "docker":
-	// 	dockerCheck, err := NewDockerCheck()
+	// 	dockerCheck, err := NewDockerCheck(checkOptions.Panic)
 	// 	if err != nil {
 	// 		return nil, err
 	// 	}
@@ -29,4 +30,9 @@ func NewChecker(registryType string) (Checker, error) {
 	default:
 		return nil, errors.New("Invalid registry type.")
 	}
+}
+
+type CheckerOptions struct {
+	RegistryType string
+	Panic        bool
 }
