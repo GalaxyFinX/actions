@@ -6,6 +6,9 @@ inputs:
   paths:
     description: "Paths in `glob` partern"
     required: true
+  paths_ignore:
+    description: "Paths to ignore in `glob` partern"
+    required: false
 
 outputs:
   matrix:
@@ -21,6 +24,7 @@ runs:
         dir_names: "true"
         json: "true"
         files: ${{ inputs.paths }}
+        files_ignore: ${{ inputs.paths_ignore }}
 
     - run: echo '${{ steps.changed-dir-names.outputs.all_changed_and_modified_files }}'
       shell: bash
