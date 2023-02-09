@@ -62,6 +62,8 @@ jobs:
         with:
           paths: |
             **/*.yaml
+          paths_ignore: |
+            .README.md
 
   echo-changed-dirs:
     name: Echo changed dirs
