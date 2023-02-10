@@ -1,0 +1,92 @@
+name: Build image with Kaniko
+
+description: |
+  This action build an OCI image with Kaniko.
+
+inputs:
+  registry:
+    description: registry url
+    required: false
+  registry-user:
+    description: registry username
+    required: false
+  registry-password:
+    description: registry password
+    required: false
+  context:
+    description: context flag
+    default: dir://${{ github.workspace }}
+    required: false
+  cache:
+    description: enable cache flag
+    required: false
+  dockerfile:
+    description: dockerfile flag
+    default: Dockerfile
+    required: false
+  no-push:
+    description: whether to push the image to the registry
+    required: false
+    default: "true"
+  tags:
+    description: list of image tags
+    required: true
+  labels:
+    description: list of image labels
+    required: false
+  test:
+    description: run this action in test mode
+    required: false
+    default: "false"
+  aws-helper:
+    description: whether to use aws helper
+    required: false
+    default: "false"
+
+runs:
+  using: composite
+  steps:
+    - run: |
+        set -o errexit
+
+        login() {
+          # Login to registry
+          if [ -n "${{ inputs.registry }}" ] && [ -n "${{ inputs.registry-user }}" ] && [ -n "${{ inputs.registry-password }}" ]; then
+            /kaniko/crane auth login ${{ inputs.registry }} \
+              -u ${{ inputs.registry-user }} \
+              -p ${{ inputs.registry-password }}
+          fi
+
+          # Login using aws helper
+          if [ "${{ inputs.aws-helper }}" = "true" ]; then
+            echo '{"credsStore":"ecr-login"}' > /kaniko/.docker/config.json
+          fi
+        }
+
+        # Build docker kargs
+        [ -n "${{ inputs.dockerfile }}" ] && kargs="$kargs --dockerfile ${{ inputs.dockerfile }} "
+        [ -n "${{ inputs.cache }}" ] && kargs="$kargs --cache "
+        [ -n "${{ inputs.no-push }}" ] && kargs="$kargs --no-push "
+
+        TAGS=(${{ inputs.tags }})
+        for tag in "${TAGS[@]}"; do
+            kargs="$kargs --destination $tag "
+        done
+
+        # Replace `spaces` by `-`
+        LABELS=($(echo "${{ inputs.labels }}" | tr ' ' '-'))
+        for label in "${LABELS[@]}"; do
+            kargs="$kargs --label \"$label\" "
+        done
+
+        # Execute kaniko build command
+        echo "Kaniko flags: $kargs"
+
+        if [ "${{ inputs.test }}" = "true" ]; then
+          echo "Test mode: skipping build"
+        else
+          login
+          echo "Building image..."
+          /kaniko/executor $kargs
+        fi
+      shell: bash
