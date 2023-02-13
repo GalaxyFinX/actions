@@ -15,7 +15,7 @@ inputs:
     required: false
   context:
     description: context flag
-    default: dir://${{ github.workspace }}
+    default: ${{ github.workspace }}
     required: false
   cache:
     description: enable cache flag
@@ -42,10 +42,10 @@ inputs:
     description: whether to use aws helper
     required: false
     default: "false"
-  tar-path:
-    description: path to save the tar file
+  docker-config-path:
+    description: path to docker config
     required: false
-    default: "/kaniko/image.tar"
+    default: "/home/runner/.docker"
 
 runs:
   using: composite
@@ -53,26 +53,15 @@ runs:
     - run: |
         set -o errexit
 
-        login() {
-          # Login to registry
-          if [ -n "${{ inputs.registry }}" ] && [ -n "${{ inputs.registry-user }}" ] && [ -n "${{ inputs.registry-password }}" ]; then
-            /kaniko/crane auth login ${{ inputs.registry }} \
-              -u ${{ inputs.registry-user }} \
-              -p ${{ inputs.registry-password }}
-          fi
-
-          # Login using aws helper
-          if [ "${{ inputs.aws-helper }}" = "true" ]; then
-            echo '{"credsStore":"ecr-login"}' > /kaniko/.docker/config.json
-          fi
-        }
-
         # Build docker kargs
         [ -n "${{ inputs.dockerfile }}" ] && kargs="$kargs --dockerfile ${{ inputs.dockerfile }} "
         [ -n "${{ inputs.cache }}" ] && kargs="$kargs --cache "
         [ -n "${{ inputs.no-push }}" ] && kargs="$kargs --no-push "
-        [ -n "${{ inputs.context }}" ] && kargs="$kargs --context ${{ inputs.context }} "
-        [ -n "${{ inputs.tar-path }}" ] && kargs="$kargs --tarPath ${{ inputs.tar-path }} "
+        [ -n "${{ inputs.context }}" ] && kargs="$kargs --context dir://${{ inputs.context }} "
+
+        # TODO: read tar-path from input
+        IMAGE_TARBALL_PATH="${{ github.workspace }}/image.tar"
+        kargs="$kargs --tar-path $IMAGE_TARBALL_PATH "
 
         TAGS=(${{ inputs.tags }})
         for tag in "${TAGS[@]}"; do
@@ -91,8 +80,16 @@ runs:
         if [ "${{ inputs.test }}" = "true" ]; then
           echo "Test mode: skipping build"
         else
-          login
+          # login
           echo "Building image..."
-          /kaniko/executor $kargs
+
+          docker run --rm \
+            -v ${{ inputs.docker-config-path }}:/kaniko/.docker:ro \
+            -v ${{ github.workspace }}:${{ github.workspace }}:rw \
+            --workdir ${{ github.workspace }} \
+            gcr.io/kaniko-project/executor:v1.9.1 $kargs
+
+          echo "Image tarball is located at $IMAGE_TARBALL_PATH"
+          echo "image-tarball-path=$IMAGE_TARBALL_PATH" >> $GITHUB_OUTPUT
         fi
       shell: bash
