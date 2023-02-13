@@ -95,6 +95,7 @@ runs:
             gcr.io/kaniko-project/executor:v1.9.1 $kargs
 
           echo "Image tarball is located at $IMAGE_TARBALL_PATH"
+          ls -la $IMAGE_TARBALL_PATH
           echo "image-tarball-path=$IMAGE_TARBALL_PATH" >> $GITHUB_OUTPUT
         fi
       shell: bash
