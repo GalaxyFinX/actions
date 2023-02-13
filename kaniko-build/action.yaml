@@ -67,6 +67,7 @@ runs:
         [ -n "${{ inputs.dockerfile }}" ] && kargs="$kargs --dockerfile ${{ inputs.dockerfile }} "
         [ -n "${{ inputs.cache }}" ] && kargs="$kargs --cache "
         [ -n "${{ inputs.no-push }}" ] && kargs="$kargs --no-push "
+        [ -n "${{ inputs.context }}" ] && kargs="$kargs --context ${{ inputs.context }} "
 
         TAGS=(${{ inputs.tags }})
         for tag in "${TAGS[@]}"; do
