@@ -9,14 +9,14 @@ permissions:
   contents: read
 
 env:
-  REGISTRY: test
-  IMAGE_NAME: test
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}/test
 
 jobs:
   # TODO: add build-and-push test
   # build-and-push:
   # ...
-  build-without-push:
+  docker-build-without-push:
     runs-on: ubuntu-22.04
     steps:
       - name: Checkout
@@ -45,6 +45,37 @@ jobs:
           push: false
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+
+  kaniko-build-without-push:
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Docker meta
+        id: meta
+        uses: docker/metadata-action@v4
+        with:
+          # list of Docker images to use as base name for tags
+          images: |
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          # generate Docker tags based on the following events/attributes
+          tags: |
+            type=ref,event=branch
+            type=ref,event=pr
+            type=semver,pattern={{version}}
+          flavor: |
+            latest=false
+
+      - name: Build and push image
+        uses: ./kaniko-build
+        with:
+          context: "."
+          dockerfile: ./docker-build/Dockerfile.test
+          no-push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          test: true
 
   get-changed-dirs:
     name: Get all changed directories
