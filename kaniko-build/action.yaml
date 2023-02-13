@@ -47,10 +47,16 @@ inputs:
     required: false
     default: "/home/runner/.docker"
 
+outputs:
+  image-tarball-path:
+    value: ${{ steps.build.outputs.image-tarball-path }}
+    description: path to image tarball
+
 runs:
   using: composite
   steps:
-    - run: |
+    - id: build
+      run: |
         set -o errexit
 
         # Build docker kargs
@@ -80,7 +86,6 @@ runs:
         if [ "${{ inputs.test }}" = "true" ]; then
           echo "Test mode: skipping build"
         else
-          # login
           echo "Building image..."
 
           docker run --rm \
