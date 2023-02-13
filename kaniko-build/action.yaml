@@ -42,6 +42,10 @@ inputs:
     description: whether to use aws helper
     required: false
     default: "false"
+  tar-path:
+    description: path to save the tar file
+    required: false
+    default: "/kaniko/image.tar"
 
 runs:
   using: composite
@@ -68,6 +72,7 @@ runs:
         [ -n "${{ inputs.cache }}" ] && kargs="$kargs --cache "
         [ -n "${{ inputs.no-push }}" ] && kargs="$kargs --no-push "
         [ -n "${{ inputs.context }}" ] && kargs="$kargs --context ${{ inputs.context }} "
+        [ -n "${{ inputs.tar-path }}" ] && kargs="$kargs --tarPath ${{ inputs.tar-path }} "
 
         TAGS=(${{ inputs.tags }})
         for tag in "${TAGS[@]}"; do
