@@ -20,6 +20,9 @@ inputs:
   cache:
     description: enable cache flag
     required: false
+  cache-repo:
+    description: cache repo flag
+    required: false
   dockerfile:
     description: dockerfile flag
     default: Dockerfile
@@ -62,6 +65,7 @@ runs:
         # Build docker kargs
         [ -n "${{ inputs.dockerfile }}" ] && kargs="$kargs --dockerfile ${{ inputs.dockerfile }} "
         [ -n "${{ inputs.cache }}" ] && kargs="$kargs --cache "
+        [ -n "${{ inputs.cache-repo }}" ] && kargs="$kargs --cache-repo ${{ inputs.cache-repo }} "
         [ -n "${{ inputs.no-push }}" ] && kargs="$kargs --no-push "
         [ -n "${{ inputs.context }}" ] && kargs="$kargs --context dir://${{ inputs.context }} "
 
@@ -95,7 +99,6 @@ runs:
             gcr.io/kaniko-project/executor:v1.9.1 $kargs
 
           echo "Image tarball is located at $IMAGE_TARBALL_PATH"
-          ls -la $IMAGE_TARBALL_PATH
           echo "image-tarball-path=$IMAGE_TARBALL_PATH" >> $GITHUB_OUTPUT
         fi
       shell: bash
