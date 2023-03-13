@@ -1,4 +1,4 @@
-FROM golang:1.19.5-alpine
+FROM nexus-registry.nonprod.galaxyfinx.in/golang:1.19.5-alpine
 
 RUN apk --no-cache add bash
 
